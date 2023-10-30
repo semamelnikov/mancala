@@ -1,9 +1,9 @@
 package com.sm.mancala.domain.pit;
 
 import com.sm.mancala.domain.game.Field;
+import com.sm.mancala.domain.player.Player;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cup extends Pit {
 
-    private Cup(int stonesNumber, UUID playerUuid, Field field) {
-        super(stonesNumber, playerUuid, field);
+    private Cup(int stonesNumber, Player player, Field field) {
+        super(stonesNumber, player, field);
     }
 
-    public static Cup createCup(int stonesNumber, UUID playerUuid, Field field) {
-        return new Cup(stonesNumber, playerUuid, field);
+    public static Cup createCup(int stonesNumber, Player player, Field field) {
+        return new Cup(stonesNumber, player, field);
     }
 
     @Override

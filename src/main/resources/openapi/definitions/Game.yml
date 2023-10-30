@@ -1,0 +1,108 @@
+GameDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    status:
+      $ref: '#/GameStatusDto'
+    field:
+      $ref: '#/FieldDto'
+    playersGroup:
+      $ref: '#/PlayersGroupDto'
+
+
+GameStatusDto:
+  type: string
+  enum:
+    - ACTIVE
+    - DRAW
+    - WIN
+
+FieldDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    lastCupIndex:
+      type: integer
+      format: int32
+    pits:
+      type: array
+      items:
+        $ref: '#/PitDto'
+
+
+PlayersGroupDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    activePlayerIndex:
+      type: integer
+      format: int32
+    players:
+      type: array
+      items:
+        $ref: '#/PlayerDto'
+
+PlayerDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+
+PitDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    playerId:
+      type: integer
+      format: int64
+    stoneCount:
+      type: integer
+      format: int32
+    type:
+      $ref: '#/PitTypeDto'
+
+PitTypeDto:
+  type: string
+  enum:
+    - CUP
+    - MANCALA
+
+GameMoveResultDataDto:
+  type: object
+  properties:
+    gameStatus:
+      $ref: '#/GameStatusDto'
+    activePlayerId:
+      type: integer
+      format: int64
+    winPlayerId:
+      type: integer
+      format: int64
+    game:
+      $ref: '#/GameDto'
+
+GameMove:
+  type: object
+  properties:
+    gameId:
+      type: integer
+      format: int64
+    playerId:
+      type: integer
+      format: int64
+    cupNumber:
+      type: integer
+      format: int32
+  required:
+    - gameId
+    - playerId
+    - cupNumber

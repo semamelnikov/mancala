@@ -2,6 +2,7 @@ package com.sm.mancala.domain.player;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import com.sm.mancala.web.model.PlayerDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,22 +23,23 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private UUID customId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "players_group_id")
     private PlayersGroup playersGroup;
 
-    private Player(UUID customId, PlayersGroup playersGroup) {
-        this.customId = customId;
+    private Player(PlayersGroup playersGroup) {
         this.playersGroup = playersGroup;
     }
 
-    public static Player createPlayer(UUID businessId, PlayersGroup playersGroup) {
-        return new Player(businessId, playersGroup);
+    public static Player createPlayer(PlayersGroup playersGroup) {
+        return new Player(playersGroup);
     }
 
-    public UUID getCustomId() {
-        return customId;
+    public Long getId() {
+        return id;
+    }
+
+    public PlayerDto toDto() {
+        return new PlayerDto().id(id);
     }
 }

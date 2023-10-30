@@ -1,9 +1,9 @@
 package com.sm.mancala.domain.pit;
 
 import com.sm.mancala.domain.game.Field;
+import com.sm.mancala.domain.player.Player;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mancala extends Pit {
 
-    private Mancala(UUID playerUuid, Field field) {
-        super(0, playerUuid, field);
+    private Mancala(Player player, Field field) {
+        super(0, player, field);
     }
 
-    public static Mancala createMancala(UUID playerUuid, Field field) {
-        return new Mancala(playerUuid, field);
+    public static Mancala createMancala(Player player, Field field) {
+        return new Mancala(player, field);
     }
 
     @Override

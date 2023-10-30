@@ -6,7 +6,8 @@ import static lombok.AccessLevel.PROTECTED;
 import com.sm.mancala.domain.pit.Pit;
 import com.sm.mancala.domain.player.Player;
 import com.sm.mancala.domain.player.PlayersGroup;
-import com.sm.mancala.web.model.GameMoveResult;
+import com.sm.mancala.web.model.GameDto;
+import com.sm.mancala.web.model.GameStatusDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,13 +19,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import java.util.Map;
-import java.util.UUID;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
 @Setter(value = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
 public class Game {
@@ -32,8 +30,6 @@ public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private UUID customId;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "players_group_id")
@@ -46,8 +42,7 @@ public class Game {
     @Enumerated(value = EnumType.STRING)
     private GameStatus status;
 
-    private Game(UUID customId, PlayersGroup playersGroup, Field field, GameStatus status) {
-        this.customId = customId;
+    private Game(PlayersGroup playersGroup, Field field, GameStatus status) {
         this.playersGroup = playersGroup;
         this.field = field;
         this.status = status;
@@ -58,44 +53,84 @@ public class Game {
         final Field field = Field.createField(playersGroup, cupsNumber, stonesNumber);
 
         return new Game(
-                UUID.randomUUID(),
                 playersGroup,
                 field,
                 GameStatus.ACTIVE
         );
     }
 
-    public GameMoveResult makeMove(UUID playerUuid, int cupNumber) {
-        validateActivePlayer(playerUuid);
-
-        final Pit moveLastPit = field.makeMove(playerUuid, cupNumber);
-
-        if (field.isPlayerFinished(playerUuid)) {
-            field.collectRemainingStonesToMancala(playerUuid);
-            final Map<UUID, Integer> scorePerPlayer = field.getScorePerPlayer();
-            determineGameResult(scorePerPlayer);
-        }
-
-        final Player nextPlayer = playersGroup.moveToNextPlayer();
-        System.out.println(nextPlayer);
-        return null;
+    public GameMoveResultData handleMoveAction(Long playerId, int cupNumber) {
+        final GameMoveResult gameMoveResult = makeMove(playerId, cupNumber);
+        return new GameMoveResultData(gameMoveResult, this);
     }
 
+    private GameMoveResult makeMove(Long playerId, int cupNumber) {
+        validateActivePlayer(playerId);
 
-    private void validateActivePlayer(UUID playerUuid) {
+        final Pit moveLastPit = field.makeMove(playerId, cupNumber);
+
+        if (field.isPlayerFinished(playerId)) {
+            return processGameFinalResult(playerId);
+        }
+
+        return GameMoveResult.builder()
+                .activePlayerId(getNextActivePlayerId(playerId, moveLastPit))
+                .currentGameStatus(status)
+                .build();
+    }
+
+    private void validateActivePlayer(Long playerId) {
         final Player activePlayer = playersGroup.getActivePlayer();
-        if (!activePlayer.getCustomId().equals(playerUuid)) {
+        if (!activePlayer.getId().equals(playerId)) {
             throw new IllegalArgumentException(
-                    String.format("Player '%s' is not active game player", playerUuid)
+                    String.format("Player '%s' is not active game player", playerId)
             );
         }
     }
 
-    private void determineGameResult(Map<UUID, Integer> scorePerPlayer) {
-        System.out.println(scorePerPlayer);
+    private GameMoveResult processGameFinalResult(Long playerId) {
+        field.collectRemainingStonesToMancala(playerId);
+        final Map<Long, Integer> scorePerPlayer = field.getScorePerPlayer();
+        updateGameFinalStatus(scorePerPlayer);
+
+        final GameMoveResult moveResult = new GameMoveResult();
+        moveResult.setCurrentGameStatus(this.status);
+        if (status.equals(GameStatus.WIN)) {
+            moveResult.setWinPlayerId(determineWinner(scorePerPlayer));
+        }
+        return moveResult;
     }
 
-    public UUID getCustomId() {
-        return customId;
+    private void updateGameFinalStatus(Map<Long, Integer> scorePerPlayer) {
+        final boolean isDraw = scorePerPlayer.values().stream()
+                .distinct()
+                .count() == 1;
+        if (isDraw) {
+            this.status = GameStatus.DRAW;
+        } else {
+            this.status = GameStatus.WIN;
+        }
+    }
+
+    private Long determineWinner(Map<Long, Integer> scorePerPlayer) {
+        return scorePerPlayer.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    private Long getNextActivePlayerId(Long playerId, Pit moveLastPit) {
+        if (moveLastPit.isMancala() && moveLastPit.isOwnedBy(playerId)) {
+            return playerId;
+        }
+        return playersGroup.moveToNextPlayer().getId();
+    }
+
+    public GameDto toDto() {
+        return new GameDto()
+                .id(id)
+                .playersGroup(playersGroup.toDto())
+                .field(field.toDto())
+                .status(GameStatusDto.valueOf(status.name().toUpperCase()));
     }
 }

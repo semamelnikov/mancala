@@ -1,10 +1,10 @@
 package com.sm.mancala.service;
 
 import com.sm.mancala.domain.game.Game;
+import com.sm.mancala.domain.game.GameMoveResultData;
+import com.sm.mancala.properties.GameProperties;
 import com.sm.mancala.repository.GameRepository;
 import com.sm.mancala.web.model.GameMove;
-import com.sm.mancala.web.model.GameMoveResult;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,34 +13,39 @@ public class GameServiceImpl implements GameService {
 
     private final GameRepository gameRepository;
 
-    private Game game;
+    private final GameProperties gameProperties;
 
-    public GameServiceImpl(GameRepository gameRepository) {
+    public GameServiceImpl(GameRepository gameRepository, GameProperties gameProperties) {
         this.gameRepository = gameRepository;
+        this.gameProperties = gameProperties;
     }
 
     @Transactional
+    @Override
     public Game createGame() {
-        final int playersNumber = 2;
-        final int stonesNumber = 6;
-        final int cupsNumber = 6;
-
-        Game game = Game.createGame(playersNumber, cupsNumber, stonesNumber);
+        final Game game = Game.createGame(
+                gameProperties.getPlayersNumber(),
+                gameProperties.getCupsNumber(),
+                gameProperties.getStonesPerCup()
+        );
         return gameRepository.save(game);
     }
 
     @Transactional
     @Override
-    public Game getGameByCustomId(UUID gameUuid) {
-        return gameRepository.findByCustomId(gameUuid).orElseThrow();
+    public GameMoveResultData processMove(GameMove gameMove) {
+        final Game game = gameRepository.findById(gameMove.getGameId()).orElseThrow();
+
+        final GameMoveResultData moveResultData =
+                game.handleMoveAction(gameMove.getPlayerId(), gameMove.getCupNumber());
+
+        gameRepository.save(moveResultData.game());
+
+        return moveResultData;
     }
 
-    @Transactional
     @Override
-    public GameMoveResult makeMove(GameMove gameMove) {
-        return game.makeMove(
-                UUID.fromString(gameMove.getPlayerId()),
-                gameMove.getCupNumber()
-        );
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId).orElseThrow();
     }
 }
