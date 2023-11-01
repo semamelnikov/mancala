@@ -1,14 +1,15 @@
 package com.sm.mancala.controller;
 
 import com.sm.mancala.service.GameService;
-import com.sm.mancala.web.api.GameApi;
+import com.sm.mancala.web.api.GamesApi;
+import com.sm.mancala.web.model.GameDto;
 import com.sm.mancala.web.model.GameMove;
-import com.sm.mancala.web.model.GameMoveResult;
+import com.sm.mancala.web.model.GameMoveResultDataDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class GameController implements GameApi {
+public class GameController implements GamesApi {
 
     private final GameService gameService;
 
@@ -17,8 +18,20 @@ public class GameController implements GameApi {
     }
 
     @Override
-    public ResponseEntity<GameMoveResult> makeGameMove(GameMove gameMove) {
-        final var result = gameService.makeMove(gameMove);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<GameMoveResultDataDto> makeGameMove(GameMove gameMove) {
+        final var gameMoveResultData = gameService.processMove(gameMove);
+        return ResponseEntity.ok(gameMoveResultData.toDto());
+    }
+
+    @Override
+    public ResponseEntity<GameDto> createGame() {
+        final var game = gameService.createGame();
+        return ResponseEntity.ok(game.toDto());
+    }
+
+    @Override
+    public ResponseEntity<GameDto> getGameById(Long gameId) {
+        final var game = gameService.getGameById(gameId);
+        return ResponseEntity.ok(game.toDto());
     }
 }

@@ -1,9 +1,14 @@
 package com.sm.mancala.service;
 
+import com.sm.mancala.domain.game.Game;
+import com.sm.mancala.domain.game.GameMoveResultData;
 import com.sm.mancala.web.model.GameMove;
-import com.sm.mancala.web.model.GameMoveResult;
 
 public interface GameService {
 
-    GameMoveResult makeMove(GameMove gameMove);
+    GameMoveResultData processMove(GameMove gameMove);
+
+    Game createGame();
+
+    Game getGameById(Long gameId);
 }

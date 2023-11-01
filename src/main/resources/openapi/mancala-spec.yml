@@ -1,0 +1,95 @@
+openapi: 3.0.3
+
+info:
+  title: Mancala API Specification for game manipulation
+  description: Mancala game API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: games
+    description: Games related operations
+
+paths:
+  /games:
+    post:
+      tags: [ games ]
+      description: Creates instance of the game
+      operationId: createGame
+      responses:
+        '200':
+          description: Game successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameDto'
+        default:
+          description: 4xx, 5xx Error Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /games/{gameId}:
+    get:
+      tags: [ games ]
+      description: Finds a game by provided custom ID
+      operationId: getGameById
+      parameters:
+        - in: path
+          name: gameId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        200:
+          description: Game successfully found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameDto'
+        default:
+          description: 4xx, 5xx Error Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /games/move:
+    post:
+      tags: [ games ]
+      description: Processes a move made by player
+      operationId: makeGameMove
+      requestBody:
+        description: Information about the move - player ID, cup's number
+        content:
+          application/json:
+            schema:
+              $ref: './definitions/Game.yml#/GameMove'
+        required: true
+      responses:
+        '200':
+          description: Game status after the move
+          content:
+            application/json:
+              schema:
+                $ref: './definitions/Game.yml#/GameMoveResultDataDto'
+        default:
+          description: 4xx, 5xx Error Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    GameDto:
+      $ref: './definitions/Game.yml#/GameDto'
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
