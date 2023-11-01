@@ -14,18 +14,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter(value = AccessLevel.PRIVATE)
 public class Player {
 
     @Id
@@ -43,8 +38,10 @@ public class Player {
     @OneToOne(mappedBy = "player", fetch = FetchType.LAZY)
     private Mancala mancala;
 
-    public Player(PlayersGroup playersGroup) {
-        this.playersGroup = playersGroup;
+    public static Player createPlayer(PlayersGroup playersGroup) {
+        final Player player = new Player();
+        player.setPlayersGroup(playersGroup);
+        return player;
     }
 
     public boolean isFinished() {
@@ -56,6 +53,23 @@ public class Player {
             mancala.sowStones(cup.pickUpStones());
         }
         return mancala;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Cup getCupsByNumber(int cupNumber) {
+        return cups.get(cupNumber - 1);
+    }
+
+    public Mancala getMancala() {
+        return mancala;
+    }
+
+    public void setPits(List<Cup> cups, Mancala mancala) {
+        this.cups = cups;
+        this.mancala = mancala;
     }
 
     public PlayerDto toDto() {

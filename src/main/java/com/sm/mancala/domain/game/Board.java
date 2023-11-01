@@ -1,8 +1,10 @@
 package com.sm.mancala.domain.game;
 
+import com.sm.mancala.domain.pit.Cup;
 import com.sm.mancala.domain.pit.Mancala;
 import com.sm.mancala.domain.pit.Pit;
 import com.sm.mancala.domain.player.Player;
+import com.sm.mancala.domain.player.PlayersGroup;
 import com.sm.mancala.web.model.BoardDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -11,19 +13,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import java.util.stream.IntStream;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter(value = AccessLevel.PRIVATE)
 public class Board {
 
     @Id
@@ -35,6 +34,53 @@ public class Board {
     private List<Pit> pits;
 
     private int lastCupIndex;
+
+    public static Board createBoardForPlayers(
+            PlayersGroup playersGroup,
+            Integer cupsNumber,
+            Integer stonesPerCup
+    ) {
+        final Board board = new Board();
+
+        final List<Player> players = playersGroup.getPlayers();
+
+        final List<Pit> pits = new ArrayList<>();
+        for (final Player player : players) {
+            // For each player we need to generate cups and one mancala
+            final List<Cup> cups = IntStream.range(0, cupsNumber)
+                    .mapToObj(i -> new Cup(stonesPerCup, player, board))
+                    .toList();
+
+            final Mancala mancala = new Mancala(player, board);
+
+            player.setPits(cups, mancala);
+
+            pits.addAll(cups);
+            pits.add(mancala);
+        }
+
+        addPitsBoardIndices(pits);
+
+        // we have all the objects in pits list and references on the same objects are stored
+        // in each player's instance for easy access.
+
+        board.setPits(pits);
+        board.setLastCupIndex(calculateLastCupIndex(pits));
+
+        return board;
+    }
+
+    private static void addPitsBoardIndices(List<Pit> pits) {
+        int currentPitIndex = 0;
+        for (final Pit pit : pits) {
+            pit.setBoardIndex(currentPitIndex);
+            currentPitIndex++;
+        }
+    }
+
+    private static int calculateLastCupIndex(List<Pit> pits) {
+        return pits.size() - 2;
+    }
 
     public Pit makeMove(Player player, int cupBoardIndex) {
         final Pit selectedPit = pits.get(cupBoardIndex);
@@ -67,6 +113,10 @@ public class Board {
     }
 
     private void processCaptureMove(Player player, int moveLastPitIndex, Pit moveLastPit) {
+        if (moveLastPit.isMancala()) {
+            return;
+        }
+
         final int oppositePitIndex = lastCupIndex - moveLastPitIndex;
         final Pit oppositePit = pits.get(oppositePitIndex);
 

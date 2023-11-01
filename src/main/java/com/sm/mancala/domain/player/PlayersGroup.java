@@ -8,17 +8,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter(value = AccessLevel.PRIVATE)
 public class PlayersGroup {
 
     @Id
@@ -30,8 +28,20 @@ public class PlayersGroup {
     @OneToMany(mappedBy = "playersGroup", cascade = CascadeType.PERSIST)
     private List<Player> players;
 
-    public Player getActivePlayer() {
-        return players.get(activePlayerIndex);
+    public static PlayersGroup createPlayersGroup(Integer playersNumber) {
+        final PlayersGroup playersGroup = new PlayersGroup();
+
+        final List<Player> players = new ArrayList<>(playersNumber);
+        for (int i = 0; i < playersNumber; i++) {
+            players.add(
+                    Player.createPlayer(playersGroup)
+            );
+        }
+
+        playersGroup.setPlayers(players);
+        playersGroup.setActivePlayerIndex(0);
+
+        return playersGroup;
     }
 
     public Player moveToNextPlayer() {
@@ -39,12 +49,22 @@ public class PlayersGroup {
         return getActivePlayer();
     }
 
+    public Player getActivePlayer() {
+        return players.get(activePlayerIndex);
+    }
+
     public List<Mancala> getFinalMancalaStates() {
-        final Long activePlayerId = getActivePlayer().getId();
         return players.stream()
-                .filter(player -> !player.getId().equals(activePlayerId))
                 .map(Player::collectStonesToMancala)
                 .toList();
+    }
+
+    public boolean hasFinishedPlayer() {
+        return players.stream().anyMatch(Player::isFinished);
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 
     public PlayersGroupDto toDto() {

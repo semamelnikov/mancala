@@ -44,7 +44,6 @@ public class Cup extends Pit {
         return player.getId();
     }
 
-
     @Override
     public void sowStones(int stonesNumber) {
         throw new IllegalStateException("Number of stones cannot be specified for Mancala Pit");

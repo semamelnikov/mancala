@@ -13,18 +13,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter(value = AccessLevel.PRIVATE)
 public class Game {
 
     @Id
@@ -41,6 +36,30 @@ public class Game {
 
     @Enumerated(value = EnumType.STRING)
     private GameStatus status;
+
+    public static Game createGame(PlayersGroup playersGroup, Board board) {
+        final Game game = new Game();
+        game.setPlayersGroup(playersGroup);
+        game.setBoard(board);
+        game.setStatus(GameStatus.ACTIVE);
+        return game;
+    }
+
+    public PlayersGroup getPlayersGroup() {
+        return playersGroup;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public GameStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
+    }
 
     public GameDto toDto() {
         return new GameDto()
