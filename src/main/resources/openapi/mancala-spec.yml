@@ -60,7 +60,7 @@ paths:
 
   /games/move:
     post:
-      tags: [ game ]
+      tags: [ games ]
       description: Processes a move made by player
       operationId: makeGameMove
       requestBody:

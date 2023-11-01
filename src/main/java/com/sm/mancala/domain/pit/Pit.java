@@ -1,6 +1,5 @@
 package com.sm.mancala.domain.pit;
 
-
 import com.sm.mancala.domain.game.Board;
 import com.sm.mancala.web.model.PitDto;
 import com.sm.mancala.web.model.PitTypeDto;
