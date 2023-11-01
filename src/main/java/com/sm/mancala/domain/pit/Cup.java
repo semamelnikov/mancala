@@ -1,28 +1,30 @@
 package com.sm.mancala.domain.pit;
 
-import com.sm.mancala.domain.game.Field;
+import com.sm.mancala.domain.game.Board;
 import com.sm.mancala.domain.player.Player;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import lombok.AccessLevel;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("CUP")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@Getter
+@Setter
 public class Cup extends Pit {
 
-    private Cup(int stonesNumber, Player player, Field field) {
-        super(stonesNumber, player, field);
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "player_id")
+    private Player player;
 
-    public static Cup createCup(int stonesNumber, Player player, Field field) {
-        return new Cup(stonesNumber, player, field);
-    }
-
-    @Override
-    public PitType getType() {
-        return PitType.CUP;
+    public Cup(Integer stoneCount, Player player, Board board) {
+        super(stoneCount, board);
+        this.player = player;
     }
 
     @Override
@@ -33,7 +35,28 @@ public class Cup extends Pit {
     }
 
     @Override
+    public boolean isSowAllowedFor(Long playerId) {
+        return true;
+    }
+
+    @Override
+    public Long getPlayerId() {
+        return player.getId();
+    }
+
+
+    @Override
     public void sowStones(int stonesNumber) {
         throw new IllegalStateException("Number of stones cannot be specified for Mancala Pit");
+    }
+
+    @Override
+    public boolean isCup() {
+        return true;
+    }
+
+    @Override
+    public boolean isMancala() {
+        return false;
     }
 }

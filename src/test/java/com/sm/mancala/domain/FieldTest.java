@@ -2,12 +2,6 @@ package com.sm.mancala.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sm.mancala.domain.game.Field;
-import com.sm.mancala.domain.pit.Pit;
-import com.sm.mancala.domain.player.PlayersGroup;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-
 public class FieldTest {
 
     /*@Test

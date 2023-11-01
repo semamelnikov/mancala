@@ -1,9 +1,7 @@
 package com.sm.mancala.domain.pit;
 
-import static lombok.AccessLevel.PRIVATE;
 
-import com.sm.mancala.domain.game.Field;
-import com.sm.mancala.domain.player.Player;
+import com.sm.mancala.domain.game.Board;
 import com.sm.mancala.web.model.PitDto;
 import com.sm.mancala.web.model.PitTypeDto;
 import jakarta.persistence.DiscriminatorColumn;
@@ -17,80 +15,67 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "pit_type", discriminatorType = DiscriminatorType.STRING)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Setter(value = PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public abstract class Pit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_id")
-    private Field field;
+    @JoinColumn(name = "board_id")
+    protected Board board;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "player_id")
-    private Player player;
+    protected int boardIndex;
 
     protected int stoneCount;
 
-    protected Pit(int stoneCount, Player player, Field field) {
+    protected Pit(Integer stoneCount, Board board) {
         this.stoneCount = stoneCount;
-        this.field = field;
-        this.player = player;
-    }
-
-    public boolean isEmpty() {
-        return this.stoneCount == 0;
-    }
-
-    public int getStoneCount() {
-        return stoneCount;
-    }
-
-    public Long getPlayerId() {
-        return player.getId();
-    }
-
-    public boolean isMancala() {
-        return this.getType().equals(PitType.MANCALA);
-    }
-
-    public boolean isCup() {
-        return this.getType().equals(PitType.CUP);
-    }
-
-    public boolean isOwnedBy(Long possibleOwnerPlayerId) {
-        return player.getId().equals(possibleOwnerPlayerId);
-    }
-
-    public boolean isSowAllowedTo(Long playerId) {
-        return isCup() || (isMancala() && isOwnedBy(playerId));
+        this.board = board;
     }
 
     public void sowStones() {
         this.stoneCount += 1;
     }
 
-    public abstract PitType getType();
+    public boolean isOwnedBy(Long playerId) {
+        return playerId.equals(getPlayerId());
+    }
+
+    public boolean isEmpty() {
+        return getStoneCount() == 0;
+    }
 
     public abstract int pickUpStones();
 
+    public abstract boolean isSowAllowedFor(Long playerId);
+
+    public abstract Long getPlayerId();
+
     public abstract void sowStones(int stonesNumber);
+
+    public abstract boolean isMancala();
+
+    public abstract boolean isCup();
 
     public PitDto toDto() {
         return new PitDto()
                 .id(id)
                 .playerId(getPlayerId())
+                .boardIndexForPlayer(boardIndex)
                 .stoneCount(stoneCount)
-                .type(PitTypeDto.valueOf(getType().name().toUpperCase()));
+                .type(isCup() ? PitTypeDto.CUP : PitTypeDto.MANCALA);
     }
 }

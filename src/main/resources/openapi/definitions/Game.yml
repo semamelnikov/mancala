@@ -6,8 +6,8 @@ GameDto:
       format: int64
     status:
       $ref: '#/GameStatusDto'
-    field:
-      $ref: '#/FieldDto'
+    board:
+      $ref: '#/BoardDto'
     playersGroup:
       $ref: '#/PlayersGroupDto'
 
@@ -19,7 +19,7 @@ GameStatusDto:
     - DRAW
     - WIN
 
-FieldDto:
+BoardDto:
   type: object
   properties:
     id:
@@ -64,6 +64,9 @@ PitDto:
     playerId:
       type: integer
       format: int64
+    boardIndexForPlayer:
+      type: integer
+      format: int32
     stoneCount:
       type: integer
       format: int32
