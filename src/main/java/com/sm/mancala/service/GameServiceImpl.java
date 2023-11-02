@@ -10,10 +10,10 @@ import com.sm.mancala.domain.pit.Mancala;
 import com.sm.mancala.domain.pit.Pit;
 import com.sm.mancala.domain.player.Player;
 import com.sm.mancala.domain.player.PlayersGroup;
-import com.sm.mancala.exception.GameRuleException;
 import com.sm.mancala.exception.NotFoundException;
 import com.sm.mancala.properties.GameProperties;
 import com.sm.mancala.repository.GameRepository;
+import com.sm.mancala.validator.GameValidator;
 import com.sm.mancala.web.model.GameMove;
 import java.util.Comparator;
 import java.util.List;
@@ -27,9 +27,13 @@ public class GameServiceImpl implements GameService {
 
     private final GameProperties gameProperties;
 
-    public GameServiceImpl(GameRepository gameRepository, GameProperties gameProperties) {
+    private final GameValidator gameValidator;
+
+    public GameServiceImpl(GameRepository gameRepository, GameProperties gameProperties,
+            GameValidator gameValidator) {
         this.gameRepository = gameRepository;
         this.gameProperties = gameProperties;
+        this.gameValidator = gameValidator;
     }
 
     @Transactional
@@ -81,11 +85,11 @@ public class GameServiceImpl implements GameService {
         final PlayersGroup playersGroup = game.getPlayersGroup();
         final Player activePlayer = playersGroup.getActivePlayer();
 
-        validateActivePlayer(activePlayer.getId(), playerId, game.getId());
-        validateCupNumberRange(cupNumber);
+        gameValidator.validateActivePlayer(activePlayer.getId(), playerId, game.getId());
+        gameValidator.validateCupNumberRange(cupNumber);
 
         final Cup cup = activePlayer.getCupsByNumber(cupNumber);
-        validateCupMoveEligibility(cup, cupNumber);
+        gameValidator.validateCupMoveEligibility(cup, cupNumber);
 
         final Board board = game.getBoard();
         final Pit lastPit = board.makeMove(activePlayer, cup.getBoardIndex());
@@ -98,33 +102,6 @@ public class GameServiceImpl implements GameService {
                 .activePlayerId(getNextActivePlayerId(playerId, lastPit, playersGroup))
                 .currentGameStatus(game.getStatus())
                 .build();
-    }
-
-    private void validateActivePlayer(Long activePlayerId, Long currentPlayerId,
-            Long currentGameId) {
-        if (!activePlayerId.equals(currentPlayerId)) {
-            throw new GameRuleException(String.format(
-                    "Player with id = %s is not active player for game with id = %s",
-                    currentPlayerId,
-                    currentGameId
-            ));
-        }
-    }
-
-    private void validateCupNumberRange(Integer cupNumber) {
-        if (cupNumber < 1 || cupNumber > gameProperties.getCupsNumber()) {
-            throw new GameRuleException(
-                    String.format("Cup number '%s' is out of range", cupNumber)
-            );
-        }
-    }
-
-    private void validateCupMoveEligibility(Cup cup, Integer cupNumber) {
-        if (cup.isEmpty()) {
-            throw new GameRuleException(
-                    String.format("Cup number '%s' is empty", cupNumber)
-            );
-        }
     }
 
     private GameMoveResult processGameFinalResult(Game game) {
