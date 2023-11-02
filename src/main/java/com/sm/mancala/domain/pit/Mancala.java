@@ -2,6 +2,7 @@ package com.sm.mancala.domain.pit;
 
 import com.sm.mancala.domain.game.Board;
 import com.sm.mancala.domain.player.Player;
+import com.sm.mancala.exception.GameRuleException;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,7 +30,7 @@ public class Mancala extends Pit {
 
     @Override
     public int pickUpStones() {
-        throw new IllegalStateException("Stones cannot be picked up from Mancala Pit");
+        throw new GameRuleException("Stones cannot be picked up from Mancala Pit");
     }
 
     @Override

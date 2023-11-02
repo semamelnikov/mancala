@@ -14,12 +14,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
+@Getter
 public class Game {
 
     @Id
@@ -43,18 +45,6 @@ public class Game {
         game.setBoard(board);
         game.setStatus(GameStatus.ACTIVE);
         return game;
-    }
-
-    public PlayersGroup getPlayersGroup() {
-        return playersGroup;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public GameStatus getStatus() {
-        return status;
     }
 
     public void setStatus(GameStatus status) {

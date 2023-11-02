@@ -10,6 +10,8 @@ import com.sm.mancala.domain.pit.Mancala;
 import com.sm.mancala.domain.pit.Pit;
 import com.sm.mancala.domain.player.Player;
 import com.sm.mancala.domain.player.PlayersGroup;
+import com.sm.mancala.exception.GameRuleException;
+import com.sm.mancala.exception.NotFoundException;
 import com.sm.mancala.properties.GameProperties;
 import com.sm.mancala.repository.GameRepository;
 import com.sm.mancala.web.model.GameMove;
@@ -49,13 +51,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getGameById(Long gameId) {
-        return gameRepository.findById(gameId).orElseThrow();
+        return gameRepository.findById(gameId).orElseThrow(
+                () -> new NotFoundException(String.format("Game with id = %s not found", gameId))
+        );
     }
 
     @Transactional
     @Override
     public GameMoveResultData processMove(GameMove gameMove) {
-        final Game game = gameRepository.findById(gameMove.getGameId()).orElseThrow();
+        final Game game = getGameById(gameMove.getGameId());
 
         final GameMoveResultData moveResultData = handleMoveAction(
                 game,
@@ -77,7 +81,7 @@ public class GameServiceImpl implements GameService {
         final PlayersGroup playersGroup = game.getPlayersGroup();
         final Player activePlayer = playersGroup.getActivePlayer();
 
-        validateActivePlayer(activePlayer.getId(), playerId);
+        validateActivePlayer(activePlayer.getId(), playerId, game.getId());
         validateCupNumberRange(cupNumber);
 
         final Cup cup = activePlayer.getCupsByNumber(cupNumber);
@@ -96,17 +100,20 @@ public class GameServiceImpl implements GameService {
                 .build();
     }
 
-    private void validateActivePlayer(Long activePlayerId, Long currentPlayerId) {
+    private void validateActivePlayer(Long activePlayerId, Long currentPlayerId,
+            Long currentGameId) {
         if (!activePlayerId.equals(currentPlayerId)) {
-            throw new IllegalArgumentException(
-                    String.format("Player '%s' is not active game player", currentPlayerId)
-            );
+            throw new GameRuleException(String.format(
+                    "Player with id = %s is not active player for game with id = %s",
+                    currentPlayerId,
+                    currentGameId
+            ));
         }
     }
 
     private void validateCupNumberRange(Integer cupNumber) {
         if (cupNumber < 1 || cupNumber > gameProperties.getCupsNumber()) {
-            throw new IllegalStateException(
+            throw new GameRuleException(
                     String.format("Cup number '%s' is out of range", cupNumber)
             );
         }
@@ -114,7 +121,7 @@ public class GameServiceImpl implements GameService {
 
     private void validateCupMoveEligibility(Cup cup, Integer cupNumber) {
         if (cup.isEmpty()) {
-            throw new IllegalStateException(
+            throw new GameRuleException(
                     String.format("Cup number '%s' is empty", cupNumber)
             );
         }
@@ -146,7 +153,7 @@ public class GameServiceImpl implements GameService {
     private Long determineGameWinner(List<Mancala> finalMancalaStates) {
         final Mancala winnerMancala = finalMancalaStates.stream()
                 .max(Comparator.comparingInt(Mancala::getStoneCount))
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("Winners' mancala not found"));
 
         return winnerMancala.getPlayerId();
     }

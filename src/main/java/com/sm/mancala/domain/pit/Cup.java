@@ -2,6 +2,7 @@ package com.sm.mancala.domain.pit;
 
 import com.sm.mancala.domain.game.Board;
 import com.sm.mancala.domain.player.Player;
+import com.sm.mancala.exception.GameRuleException;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,7 +47,7 @@ public class Cup extends Pit {
 
     @Override
     public void sowStones(int stonesNumber) {
-        throw new IllegalStateException("Number of stones cannot be specified for Mancala Pit");
+        throw new GameRuleException("Number of stones cannot be specified for Mancala Pit");
     }
 
     @Override
