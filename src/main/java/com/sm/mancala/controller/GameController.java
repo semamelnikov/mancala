@@ -2,6 +2,7 @@ package com.sm.mancala.controller;
 
 import com.sm.mancala.service.GameService;
 import com.sm.mancala.web.api.GamesApi;
+import com.sm.mancala.web.model.CreateGameRequest;
 import com.sm.mancala.web.model.GameDto;
 import com.sm.mancala.web.model.GameMove;
 import com.sm.mancala.web.model.GameMoveResultDataDto;
@@ -24,8 +25,11 @@ public class GameController implements GamesApi {
     }
 
     @Override
-    public ResponseEntity<GameDto> createGame() {
-        final var game = gameService.createGame();
+    public ResponseEntity<GameDto> createGame(CreateGameRequest createGameRequest) {
+        final var game = gameService.createGame(
+                createGameRequest.getPlayersNumber(),
+                createGameRequest.getStonesPerCup()
+        );
         return ResponseEntity.ok(game.toDto());
     }
 

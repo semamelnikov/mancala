@@ -17,4 +17,3 @@ spring:
 game:
   players-number: 2
   cups-number: 6
-  stones-per-cup: 4

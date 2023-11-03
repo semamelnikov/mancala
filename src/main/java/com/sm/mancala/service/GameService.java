@@ -8,7 +8,7 @@ public interface GameService {
 
     GameMoveResultData processMove(GameMove gameMove);
 
-    Game createGame();
+    Game createGame(Integer playersNumber, Integer stonesPerCup);
 
     Game getGameById(Long gameId);
 }

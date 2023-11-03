@@ -91,6 +91,21 @@ GameMoveResultDataDto:
     game:
       $ref: '#/GameDto'
 
+CreateGameRequest:
+  type: object
+  properties:
+    playersNumber:
+      type: integer
+      format: int32
+      minimum: 2
+    stonesPerCup:
+      type: integer
+      format: int32
+      minimum: 1
+  required:
+    - playersNumber
+    - stonesPerCup
+
 GameMove:
   type: object
   properties:

@@ -18,6 +18,13 @@ paths:
       tags: [ games ]
       description: Creates instance of the game
       operationId: createGame
+      requestBody:
+        description: Information about the move - game ID, player ID and cup number
+        content:
+          application/json:
+            schema:
+              $ref: './definitions/Game.yml#/CreateGameRequest'
+        required: true
       responses:
         '200':
           description: Game successfully created

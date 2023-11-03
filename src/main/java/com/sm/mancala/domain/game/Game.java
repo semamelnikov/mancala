@@ -47,6 +47,10 @@ public class Game {
         return game;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setStatus(GameStatus status) {
         this.status = status;
     }
