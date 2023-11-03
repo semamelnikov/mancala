@@ -14,18 +14,13 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "pit_type", discriminatorType = DiscriminatorType.STRING)
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Pit {
 
     @Id
@@ -37,6 +32,8 @@ public abstract class Pit {
     protected Board board;
 
     protected int boardIndex;
+
+    protected int boardNumberForPlayer;
 
     protected int stoneCount;
 
@@ -69,11 +66,27 @@ public abstract class Pit {
 
     public abstract boolean isCup();
 
+    public int getStoneCount() {
+        return stoneCount;
+    }
+
+    public int getBoardIndex() {
+        return boardIndex;
+    }
+
+    public void setBoardIndex(int boardIndex) {
+        this.boardIndex = boardIndex;
+    }
+
+    public void setBoardNumberForPlayer(int boardNumberForPlayer) {
+        this.boardNumberForPlayer = boardNumberForPlayer;
+    }
+
     public PitDto toDto() {
         return new PitDto()
                 .id(id)
                 .playerId(getPlayerId())
-                .boardIndexForPlayer(boardIndex)
+                .boardNumberForPlayer(boardNumberForPlayer)
                 .stoneCount(stoneCount)
                 .type(isCup() ? PitTypeDto.CUP : PitTypeDto.MANCALA);
     }

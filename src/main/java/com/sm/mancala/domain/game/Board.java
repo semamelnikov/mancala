@@ -59,7 +59,7 @@ public class Board {
             pits.add(mancala);
         }
 
-        addPitsBoardIndices(pits);
+        addPitsBoardIndices(pits, cupsNumber);
 
         // we have all the objects in pits list and references on the same objects are stored
         // in each player's instance for easy access.
@@ -70,11 +70,15 @@ public class Board {
         return board;
     }
 
-    private static void addPitsBoardIndices(List<Pit> pits) {
+    private static void addPitsBoardIndices(List<Pit> pits, Integer cupsNumber) {
+        int pitsPerPlayer = cupsNumber + 1;
+        int currentPitNumberForPlayer = 0;
         int currentPitIndex = 0;
         for (final Pit pit : pits) {
             pit.setBoardIndex(currentPitIndex);
+            pit.setBoardNumberForPlayer((currentPitNumberForPlayer % pitsPerPlayer) + 1);
             currentPitIndex++;
+            currentPitNumberForPlayer++;
         }
     }
 
@@ -130,7 +134,7 @@ public class Board {
                 && moveLastPit.getStoneCount() == 1 && !oppositePit.isEmpty();
     }
 
-    public void makeCaptureAction(Mancala mancala, Pit pit, Pit oppositePit) {
+    private void makeCaptureAction(Mancala mancala, Pit pit, Pit oppositePit) {
         mancala.sowStones(pit.pickUpStones());
         mancala.sowStones(oppositePit.pickUpStones());
     }

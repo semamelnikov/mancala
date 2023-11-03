@@ -64,7 +64,7 @@ PitDto:
     playerId:
       type: integer
       format: int64
-    boardIndexForPlayer:
+    boardNumberForPlayer:
       type: integer
       format: int32
     stoneCount:
@@ -82,8 +82,6 @@ PitTypeDto:
 GameMoveResultDataDto:
   type: object
   properties:
-    gameStatus:
-      $ref: '#/GameStatusDto'
     activePlayerId:
       type: integer
       format: int64

@@ -15,5 +15,4 @@ public class GameMoveResult {
 
     private Long activePlayerId;
     private Long winPlayerId;
-    private GameStatus currentGameStatus;
 }

@@ -84,11 +84,9 @@ public class GameServiceImpl implements GameService {
     private GameMoveResult makeMove(Game game, Long playerId, Integer cupNumber) {
         final PlayersGroup playersGroup = game.getPlayersGroup();
         final Player activePlayer = playersGroup.getActivePlayer();
-
         gameValidator.validateActivePlayer(activePlayer.getId(), playerId, game.getId());
-        gameValidator.validateCupNumberRange(cupNumber);
 
-        final Cup cup = activePlayer.getCupsByNumber(cupNumber);
+        final Cup cup = activePlayer.getCupByNumber(cupNumber);
         gameValidator.validateCupMoveEligibility(cup, cupNumber);
 
         final Board board = game.getBoard();
@@ -100,7 +98,6 @@ public class GameServiceImpl implements GameService {
 
         return GameMoveResult.builder()
                 .activePlayerId(getNextActivePlayerId(playerId, lastPit, playersGroup))
-                .currentGameStatus(game.getStatus())
                 .build();
     }
 
@@ -113,7 +110,6 @@ public class GameServiceImpl implements GameService {
         );
 
         final GameMoveResult moveResult = new GameMoveResult();
-        moveResult.setCurrentGameStatus(game.getStatus());
         if (game.getStatus().equals(GameStatus.WIN)) {
             moveResult.setWinPlayerId(determineGameWinner(finalMancalaStates));
         }

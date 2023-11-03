@@ -2,6 +2,7 @@ package com.sm.mancala.domain.player;
 
 import com.sm.mancala.domain.pit.Cup;
 import com.sm.mancala.domain.pit.Mancala;
+import com.sm.mancala.exception.GameRuleException;
 import com.sm.mancala.web.model.PlayerDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,12 +56,21 @@ public class Player {
         return mancala;
     }
 
+    public Cup getCupByNumber(int cupNumber) {
+        if (cupNumber < 1 || cupNumber > cups.size()) {
+            throw new GameRuleException(
+                    String.format("Cup number '%s' is out of range", cupNumber)
+            );
+        }
+        return cups.get(cupNumber - 1);
+    }
+
     public Long getId() {
         return id;
     }
 
-    public Cup getCupsByNumber(int cupNumber) {
-        return cups.get(cupNumber - 1);
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Mancala getMancala() {

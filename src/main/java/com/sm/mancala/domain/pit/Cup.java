@@ -8,15 +8,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("CUP")
-@NoArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cup extends Pit {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,7 +44,7 @@ public class Cup extends Pit {
 
     @Override
     public void sowStones(int stonesNumber) {
-        throw new GameRuleException("Number of stones cannot be specified for Mancala Pit");
+        throw new GameRuleException("Number of stones cannot be specified for Cup Pit");
     }
 
     @Override

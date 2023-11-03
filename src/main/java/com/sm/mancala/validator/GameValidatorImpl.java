@@ -2,17 +2,10 @@ package com.sm.mancala.validator;
 
 import com.sm.mancala.domain.pit.Cup;
 import com.sm.mancala.exception.GameRuleException;
-import com.sm.mancala.properties.GameProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GameValidatorImpl implements GameValidator {
-
-    private final GameProperties gameProperties;
-
-    public GameValidatorImpl(GameProperties gameProperties) {
-        this.gameProperties = gameProperties;
-    }
 
     @Override
     public void validateActivePlayer(Long activePlayerId, Long currentPlayerId, Long gameId) {
@@ -22,15 +15,6 @@ public class GameValidatorImpl implements GameValidator {
                     currentPlayerId,
                     gameId
             ));
-        }
-    }
-
-    @Override
-    public void validateCupNumberRange(Integer currentCupNumber) {
-        if (currentCupNumber < 1 || currentCupNumber > gameProperties.getCupsNumber()) {
-            throw new GameRuleException(
-                    String.format("Cup number '%s' is out of range", currentCupNumber)
-            );
         }
     }
 
