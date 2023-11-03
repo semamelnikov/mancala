@@ -1,5 +1,6 @@
 package com.sm.mancala.exception;
 
+import com.sm.mancala.web.model.ErrorResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +56,6 @@ public class ExceptionHandlerAdvisor {
     }
 
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
-        return new ResponseEntity<>(new ErrorResponse(message), status);
+        return new ResponseEntity<>(new ErrorResponse().message(message), status);
     }
 }

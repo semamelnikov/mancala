@@ -6,6 +6,7 @@ import com.sm.mancala.web.model.CreateGameRequest;
 import com.sm.mancala.web.model.GameDto;
 import com.sm.mancala.web.model.GameMove;
 import com.sm.mancala.web.model.GameMoveResultDataDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +31,7 @@ public class GameController implements GamesApi {
                 createGameRequest.getPlayersNumber(),
                 createGameRequest.getStonesPerCup()
         );
-        return ResponseEntity.ok(game.toDto());
+        return ResponseEntity.status(HttpStatus.CREATED).body(game.toDto());
     }
 
     @Override

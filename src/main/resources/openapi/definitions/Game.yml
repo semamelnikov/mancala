@@ -118,6 +118,7 @@ GameMove:
     cupNumber:
       type: integer
       format: int32
+      minimum: 1
   required:
     - gameId
     - playerId
