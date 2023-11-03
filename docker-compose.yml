@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  mancala-service:
+    image: 'mancala-service:latest'
+    build:
+      context: .
+    container_name: mancala-service
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mancala_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+
+  db:
+    image: 'postgres:14.7'
+    container_name: mancala_db
+    ports:
+      - '5590:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=mancala_db
