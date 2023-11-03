@@ -3,7 +3,19 @@
 ***
 
 ## Description:
+This service is a web application written in Java programming language using the Spring Boot framework. 
+The service provides an API with which you can play a board game called Mancala. The game is designed 
+for 2 people who take turns making moves and moving stones from one pit to another according to 
+certain rules - they can be found [here](https://www.scholastic.com/content/dam/teachers/blogs/alycia-zimmerman/migrated-files/mancala_rules.pdf).
 
+From the point of view of service implementation, the logic of moves and changes in the state of 
+the game board is encapsulated in domain objects, which themselves implement the business logic and 
+are responsible for their correct behavior. This makes them look like Rich domain model objects - 
+objects without no-args constructors, public setters or getters in order to prevent inconsistent 
+object instantiation and to keep encapsulation from breaking.
+
+Player interaction with the game, game constraints validations, the next player or winner 
+determination is implemented in the service layer in the more usual, Anemic domain model, way.
 
 ## Prerequisites:
 
