@@ -1,7 +1,5 @@
 # Mancala game service
 
-***
-
 ## Description:
 This service is a web application written in Java programming language using the Spring Boot framework. 
 The service provides an API with which you can play a board game called Mancala. The game is designed 
