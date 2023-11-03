@@ -97,7 +97,19 @@ Request example:
 }
 ```
 
-Response example:
+In the response API client receives the object that represents a Game entity. 
+It has the following information:
+
+- Game ID
+- Current game status - it should be ACTIVE right after creation
+- Board object
+- Players group object with IDs of the game players
+
+List of pits can be retrieved from the `board` field. Each `pit` stores information about 
+- current number of stones,
+- its current number relative to the player (1 - 7),
+- ID of the player to whom it belongs,
+- as well as the type - cup or mancala.
 
 ```json
 {
