@@ -1,6 +1,6 @@
 # Mancala game service
 
-## Description:
+## Description
 This service is a web application written in Java programming language using the Spring Boot framework. 
 The service provides an API with which you can play a board game called Mancala. The game is designed 
 for 2 people who take turns making moves and moving stones from one pit to another according to 
@@ -15,11 +15,11 @@ object instantiation and to keep encapsulation from breaking.
 Player interaction with the game, game constraints validations, the next player or winner 
 determination is implemented in the service layer in the more usual, Anemic domain model, way.
 
-## Prerequisites:
+## Prerequisites
 
 * Docker CLI and Docker Compose V2 installed
 
-## Startup:
+## Startup
 
 To start the application, please execute the following command from the root of the project:
 
@@ -82,13 +82,14 @@ of stones, which are the main source of game points.
 **Game**: the core entity of the game, which is the link between the players group and the game board.
 The game has several statuses: it can be **ACTIVE**, and it can also end with the **WIN** or **DRAW** statuses.
 
-## Endpoints:
+## Endpoints
 
 There are two main endpoints that should be used to execute game related operations:
 
 1. `POST /games` - to create a game instance based on defined parameters.
 
-Request example:
+The API client can determine the number of players (NOTE: currently only 2 players are supported) 
+and the initial number of stones in each cup. By default, the number of cups is 6 for each user.
 
 ```json
 {
@@ -236,7 +237,8 @@ List of pits can be retrieved from the `board` field. Each `pit` stores informat
 
 2. `POST /games/move` - to make a game move as a player.
 
-Request example:
+The API client must set the game ID, the current player ID, and the cup number (1-7) of the current turn. 
+All the fields are required.
 
 ```json
 {
@@ -246,7 +248,10 @@ Request example:
 }
 ```
 
-Response example:
+In the response API client receives
+- Game object to process updated Board's state,
+- Active player ID to understand whose turn is next,
+- Winner's player ID for the cases when Game status is **WIN**.
 
 ```json
 {
